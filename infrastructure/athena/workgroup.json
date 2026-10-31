@@ -1,0 +1,11 @@
+{
+  "EnforceWorkGroupConfiguration": true,
+  "ResultConfiguration": {
+    "OutputLocation": "s3://bikepulse-578771850678-ap-northeast-2/athena-results/workgroup=bikepulse-dev/",
+    "EncryptionConfiguration": {
+      "EncryptionOption": "SSE_S3"
+    },
+    "ExpectedBucketOwner": "578771850678"
+  },
+  "BytesScannedCutoffPerQuery": 104857600
+}
