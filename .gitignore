@@ -64,3 +64,9 @@ temp/
 
 # Local XGBoost experiments
 /data/xgboost/
+
+# Local model packaging data
+/data/package/
+
+# Machine learning model binaries
+*.joblib
