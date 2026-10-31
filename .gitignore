@@ -61,3 +61,6 @@ temp/
 
 # Local model training data and artifacts
 /data/training/
+
+# Local XGBoost experiments
+/data/xgboost/
