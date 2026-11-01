@@ -82,3 +82,6 @@ temp/
 
 # Local backup of bucket notification configuration
 /infrastructure/eventbridge/s3-notification-before.json
+
+# Local serving model configuration and test data
+/data/serving/
