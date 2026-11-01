@@ -1,0 +1,14 @@
+[
+  {
+    "Id": "BikePulseIngestionStateMachine",
+    "Arn": "arn:aws:states:ap-northeast-2:578771850678:stateMachine:bikepulse-dev-ingestion-pipeline",
+    "RoleArn": "arn:aws:iam::578771850678:role/bikepulse-dev-eventbridge-start-role",
+    "RetryPolicy": {
+      "MaximumRetryAttempts": 3,
+      "MaximumEventAgeInSeconds": 3600
+    },
+    "DeadLetterConfig": {
+      "Arn": "arn:aws:sqs:ap-northeast-2:578771850678:bikepulse-dev-ingestion-dlq"
+    }
+  }
+]

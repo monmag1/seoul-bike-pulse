@@ -1,0 +1,138 @@
+{
+  "Comment": "BikePulse S3 EventBridge ingestion validation",
+  "QueryLanguage": "JSONPath",
+  "StartAt": "CheckS3Event",
+  "TimeoutSeconds": 1200,
+  "States": {
+    "CheckS3Event": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "And": [
+            {
+              "Variable": "$.source",
+              "IsPresent": true
+            },
+            {
+              "Variable": "$.source",
+              "StringEquals": "aws.s3"
+            },
+            {
+              "Variable": "$['detail-type']",
+              "IsPresent": true
+            },
+            {
+              "Variable": "$['detail-type']",
+              "StringEquals": "Object Created"
+            },
+            {
+              "Variable": "$.detail.bucket.name",
+              "IsPresent": true
+            },
+            {
+              "Variable": "$.detail.object.key",
+              "IsPresent": true
+            },
+            {
+              "Variable": "$.detail.object.key",
+              "IsString": true
+            },
+            {
+              "Variable": "$.detail.bucket.name",
+              "StringEquals": "bikepulse-578771850678-ap-northeast-2"
+            }
+          ],
+          "Next": "RunIngestionWorker"
+        }
+      ],
+      "Default": "IngestionFailed"
+    },
+    "RunIngestionWorker": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::ecs:runTask.sync",
+      "Parameters": {
+        "Cluster": "arn:aws:ecs:ap-northeast-2:578771850678:cluster/bikepulse-dev-ecs",
+        "TaskDefinition": "arn:aws:ecs:ap-northeast-2:578771850678:task-definition/bikepulse-dev-ingestion-task:2",
+        "LaunchType": "FARGATE",
+        "PlatformVersion": "LATEST",
+        "NetworkConfiguration": {
+          "AwsvpcConfiguration": {
+            "Subnets": [
+              "subnet-04673ec84a4bbfa16"
+            ],
+            "SecurityGroups": [
+              "sg-090848f4ddc1bb9cc"
+            ],
+            "AssignPublicIp": "DISABLED"
+          }
+        },
+        "Overrides": {
+          "ContainerOverrides": [
+            {
+              "Name": "ingestion",
+              "Environment": [
+                {
+                  "Name": "S3_EVENT_JSON",
+                  "Value.$": "States.JsonToString($)"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "TimeoutSeconds": 900,
+      "ResultPath": "$.ecsResult",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "AmazonECS.Unknown"
+          ],
+          "IntervalSeconds": 10,
+          "MaxAttempts": 2,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.taskError",
+          "Next": "IngestionFailed"
+        }
+      ],
+      "Next": "CheckWorkerExitCode"
+    },
+    "CheckWorkerExitCode": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "And": [
+            {
+              "Variable": "$.ecsResult.Containers[0].ExitCode",
+              "IsPresent": true
+            },
+            {
+              "Variable": "$.ecsResult.Containers[0].ExitCode",
+              "IsNumeric": true
+            },
+            {
+              "Variable": "$.ecsResult.Containers[0].ExitCode",
+              "NumericEquals": 0
+            }
+          ],
+          "Next": "IngestionCompleted"
+        }
+      ],
+      "Default": "IngestionFailed"
+    },
+    "IngestionCompleted": {
+      "Type": "Succeed"
+    },
+    "IngestionFailed": {
+      "Type": "Fail",
+      "Error": "BikePulseIngestionFailed",
+      "Cause": "Review DynamoDB ingestion ledger, S3 quality report, and ECS logs"
+    }
+  }
+}
