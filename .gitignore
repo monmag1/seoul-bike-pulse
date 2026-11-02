@@ -85,3 +85,11 @@ temp/
 
 # Local serving model configuration and test data
 /data/serving/
+
+# Stage U/V local credentials, deployment state and backups
+.bikepulse-*.env
+.bikepulse-*-state/
+.backup-stage-u/
+backups/
+infrastructure/alb/v-backup/
+stage-v/scripts/*.before-*

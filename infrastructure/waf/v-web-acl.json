@@ -1,0 +1,70 @@
+{
+    "Name": "bikepulse-dev-web-acl",
+    "Scope": "REGIONAL",
+    "DefaultAction": {
+        "Allow": {}
+    },
+    "Description": "BikePulse STAGING signed-in model POST abuse throttle",
+    "Rules": [
+        {
+            "Name": "bikepulse-dev-predict-rate-limit",
+            "Priority": 0,
+            "Statement": {
+                "RateBasedStatement": {
+                    "Limit": 300,
+                    "EvaluationWindowSec": 300,
+                    "AggregateKeyType": "IP",
+                    "ScopeDownStatement": {
+                        "AndStatement": {
+                            "Statements": [
+                                {
+                                    "ByteMatchStatement": {
+                                        "SearchString": "UE9TVA==",
+                                        "FieldToMatch": {
+                                            "Method": {}
+                                        },
+                                        "TextTransformations": [
+                                            {
+                                                "Priority": 0,
+                                                "Type": "NONE"
+                                            }
+                                        ],
+                                        "PositionalConstraint": "EXACTLY"
+                                    }
+                                },
+                                {
+                                    "ByteMatchStatement": {
+                                        "SearchString": "L2FwaS92MS9wcmVkaWN0",
+                                        "FieldToMatch": {
+                                            "UriPath": {}
+                                        },
+                                        "TextTransformations": [
+                                            {
+                                                "Priority": 0,
+                                                "Type": "NONE"
+                                            }
+                                        ],
+                                        "PositionalConstraint": "EXACTLY"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "Action": {
+                "Block": {}
+            },
+            "VisibilityConfig": {
+                "SampledRequestsEnabled": true,
+                "CloudWatchMetricsEnabled": true,
+                "MetricName": "BikePulsePredictRateLimit"
+            }
+        }
+    ],
+    "VisibilityConfig": {
+        "SampledRequestsEnabled": true,
+        "CloudWatchMetricsEnabled": true,
+        "MetricName": "BikePulseWebACL"
+    }
+}

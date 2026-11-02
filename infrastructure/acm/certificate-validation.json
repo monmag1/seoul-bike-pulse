@@ -1,0 +1,18 @@
+{
+  "Comment": "BikePulse ACM DNS validation",
+  "Changes": [
+    {
+      "Action": "UPSERT",
+      "ResourceRecordSet": {
+        "Name": "_02643646d38f10476202bb7bcbe978c3.bike.mon5032.cloud.",
+        "Type": "CNAME",
+        "TTL": 300,
+        "ResourceRecords": [
+          {
+            "Value": "_b1c86d0ce58efa7adaeae72c7768ebc5.wzccmgtwzk.acm-validations.aws."
+          }
+        ]
+      }
+    }
+  ]
+}

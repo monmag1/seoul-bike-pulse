@@ -1,0 +1,20 @@
+[
+  {
+    "Type": "authenticate-cognito",
+    "Order": 1,
+    "AuthenticateCognitoConfig": {
+      "UserPoolArn": "arn:aws:cognito-idp:ap-northeast-2:578771850678:userpool/ap-northeast-2_7ptFFI6aX",
+      "UserPoolClientId": "1v0t1t96ecn1qq6gus8q0vhjov",
+      "UserPoolDomain": "bikepulse-dev-578771850678",
+      "SessionCookieName": "BikePulseAuth",
+      "SessionTimeout": 3600,
+      "Scope": "openid email profile",
+      "OnUnauthenticatedRequest": "deny"
+    }
+  },
+  {
+    "Type": "forward",
+    "Order": 2,
+    "TargetGroupArn": "arn:aws:elasticloadbalancing:ap-northeast-2:578771850678:targetgroup/bikepulse-dev-tg-api/b0f735b2f95a8d10"
+  }
+]

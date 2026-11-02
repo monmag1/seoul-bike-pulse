@@ -1,0 +1,24 @@
+{
+  "feature_version": "fv001",
+  "features": {
+    "hour": 0,
+    "day_of_week": 2,
+    "is_weekend": false,
+    "month": 8,
+    "day_of_year": 213,
+    "hour_sin": 0.0,
+    "hour_cos": 1.0,
+    "dow_sin": 0.9749279121818236,
+    "dow_cos": -0.22252093395631434,
+    "season": "summer",
+    "is_holiday": false,
+    "temperature_c": 30.5,
+    "humidity_pct": 68.0,
+    "wind_speed_mps": 1.9,
+    "visibility_10m": 2000.0,
+    "dew_point_temperature_c": 23.9,
+    "solar_radiation_mj_m2": 0.0,
+    "rainfall_mm": 0.0,
+    "snowfall_cm": 0.0
+  }
+}

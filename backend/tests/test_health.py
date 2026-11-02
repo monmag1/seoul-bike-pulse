@@ -1,28 +1,26 @@
 from fastapi.testclient import TestClient
-
 from app.main import app
 
 
-client = TestClient(app)
-
-
 def test_root():
-    response = client.get("/")
+    with TestClient(app) as client:
+        response = client.get("/")
 
     assert response.status_code == 200
 
     data = response.json()
-
-    assert data["status"] == "running"
+    assert data["service"] == "bikepulse-api"
+    assert data["api_version"] == "v1"
 
 
 def test_health():
-    response = client.get("/api/v1/health")
+    with TestClient(app) as client:
+        response = client.get("/api/v1/health")
 
     assert response.status_code == 200
 
     data = response.json()
-
     assert data["status"] == "ok"
-    assert data["service"] == "bikepulse-api"
-    assert data["model_loaded"] is False
+    assert data["model_loaded"] is True
+    assert "model_id" in data
+    assert "model_version" in data

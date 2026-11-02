@@ -1,0 +1,19 @@
+SEOUL BIKE PULSE / Stage V HTTPS-Cognito-WAF toolkit
+This package DOES NOT configure AWS automatically. Run commands in the ChatGPT Stage V tutorial in order.
+
+Files:
+00_env.example.sh       Environment template (use with caution, never paste real secrets)
+scripts/01_patch_backend_auth.py   Correct Stage U dashboard ALB signed user access and add Origin guard
+scripts/02_secure_api_build_deploy.sh   Rebuild only FastAPI, pin ECR digest, register new task definition and update existing API service
+scripts/03_https_rules.py    Generate HTTPS Cognito ALB default frontend and /api/* actions (requires exported ARN variables)
+scripts/04_http_redirect_safely.sh    Fail closed/delete known 10/11/20 HTTP 80 priority rules then default 301 to HTTPS
+scripts/05_waf_acl_json.py    Generate WAF v2 rate ACL (POST exact /api/v1/predict 300/300sec/IP)
+
+Security checkpoints:
+- Verify 443 TLS, Cognito login and API auth BEFORE running HTTP rule cleanup.
+- Secure API deployment is intended for a one-way Stage U -> V migration, not the Stage U deployment script.
+- All stateful operations require operator review; ACL and Route53 record conflicts are NOT auto-overwritten.
+- ADMIN_ACTIONS remains disabled; Origin header is NOT authentication.
+- ALB authenticated requests need network egress to ALB regional public signing keys endpoint from API ECS.
+- Frontend and backend ECS task definitions/model payload preserved; only FastAPI API task definition changes.
+- Don't reuse Stage U 05_deploy.sh after HTTP 80 redirect migration.

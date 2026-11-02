@@ -152,6 +152,7 @@ def model_example(request: Request):
     }
 
 
+@app.post("/api/v1/machine/predict", include_in_schema=False)
 @app.post("/api/v1/predict")
 def predict(
     body: PredictionRequest,
@@ -253,3 +254,33 @@ def predict(
         "request_id": request_id,
         "latency_ms": elapsed_ms
     }
+
+# 단계 U A~E 확장 API (기존 단계 T 엔드포인트 변경 없음)
+from app.routers.af.router import router as af_router
+app.include_router(af_router)
+
+
+# Stage V: ALB Cognito-origin protection for state-changing browser API requests
+from fastapi.responses import JSONResponse as _V_JSONResponse
+
+@app.middleware("http")
+async def v_enforce_browser_origin(request: Request, call_next):
+    # Origin checks are defense in depth; verified ALB login is the identity gate.
+    if (
+        os.environ.get("AUTH_MODE") == "alb"
+        and request.url.path.startswith("/api/v1/")
+        and request.url.path != "/api/v1/machine/predict"
+        and request.method in {"POST", "PUT", "PATCH", "DELETE"}
+    ):
+        expected = os.environ.get("ALLOWED_ORIGIN", "")
+        if not expected:
+            return _V_JSONResponse(
+                status_code=503,
+                content={"detail": {"code": "ORIGIN_NOT_CONFIGURED"}}
+            )
+        if request.headers.get("origin") != expected:
+            return _V_JSONResponse(
+                status_code=403,
+                content={"detail": {"code": "INVALID_ORIGIN"}}
+            )
+    return await call_next(request)
